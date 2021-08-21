@@ -3,7 +3,7 @@
   "type": "library",
   "license": "MIT",
   "require": {
-    "php": ">=8.0",
+    "php": ">=7.3",
     "amphp/parallel": "^1.4",
     "symfony/http-client": "^5.3"
   },
