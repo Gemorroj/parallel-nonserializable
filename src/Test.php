@@ -3,7 +3,8 @@
 namespace App;
 
 use Amp\Parallel\Worker;
-use Amp\Promise;
+use Amp\Future;
+use function Amp\launch;
 
 class Test
 {
@@ -14,30 +15,25 @@ class Test
         $this->httpClient = $httpClient ?: new HttpClient();
     }
 
-    public function run()
+    public function run(): array
     {
-        $resultPromises = [];
+        $futures = [];
 
-        foreach ($this->makeDelays() as $delay) {
-            $resultPromises[] = Worker\enqueueCallable(
+        foreach ([1, 1, 1, 1, 1, 2] as $delay) {
+            $futures[] = launch(fn () => Worker\enqueueCallable(
                 [$this, 'makeResult'],
                 $delay,
-            );
+            ));
         }
 
-        return Promise\wait(Promise\all($resultPromises));
+        return Future\all($futures);
     }
 
     /**
      * Non serializable method
      */
-    public function makeResult(string $delay)
+    public function makeResult(string $delay): array
     {
         return $this->httpClient->get($delay);
-    }
-
-    private function makeDelays(): array
-    {
-        return [1, 1, 1, 1, 1, 2];
     }
 }
